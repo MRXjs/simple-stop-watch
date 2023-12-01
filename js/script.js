@@ -10,7 +10,6 @@ const resetButton = document.getElementById("resetBtn");
 const lapList = document.getElementById("laplist");
 
 /// stopWatch variables
-
 let minutes = 0;
 let seconds = 0;
 let milliseconds = 0;
@@ -25,9 +24,25 @@ function startTimer() {
   interval = setInterval(updateTimer, 10);
   startButton.disabled = true;
 }
-function stopTimer() {}
-function pauseTimer() {}
-function resetTimer() {}
+
+function stopTimer() {
+  clearInterval(interval);
+  addToLapList();
+  resetTimerData();
+  startButton.disabled = false;
+}
+
+function pauseTimer() {
+  clearInterval(interval);
+  startButton.disabled = false;
+}
+
+function resetTimer() {
+  clearInterval(interval);
+  resetTimerData();
+  startButton.disabled = false;
+}
+
 function updateTimer() {
   milliseconds++;
   if (milliseconds === 100) {
@@ -38,12 +53,41 @@ function updateTimer() {
       minutes++;
     }
   }
-
   displayTimer();
 }
 
 function displayTimer() {
-  millisecondsLabel.textContent = milliseconds;
-  secondsLabel.textContent = seconds;
-  minutesLabel.textContent = minutes;
+  millisecondsLabel.textContent = padTime(milliseconds);
+  secondsLabel.textContent = padTime(seconds);
+  minutesLabel.textContent = padTime(minutes);
+}
+
+function padTime(time) {
+  return time.toString().padStart(2, "0");
+}
+
+function resetTimerData() {
+  minutes = 0;
+  seconds = 0;
+  milliseconds = 0;
+  displayTimer();
+}
+
+function addToLapList() {
+  const listItemNo = lapList.childElementCount + 1;
+  const lapTime = `${padTime(minutes)}:${padTime(seconds)}:${padTime(
+    milliseconds
+  )}`;
+  const listItem = document.createElement("li");
+  listItem.id = `lap${listItemNo}`;
+  listItem.onclick = function () {
+    removeListItem(listItemNo);
+  };
+  listItem.innerHTML = `<span>Lap ${listItemNo}:
+  </span>${lapTime}`;
+  lapList.appendChild(listItem);
+}
+
+function removeListItem(id) {
+  document.getElementById(`lap${id}`).remove();
 }
